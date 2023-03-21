@@ -17,7 +17,7 @@ const IndexPopup = () => {
             <p>
               <a
                 target="_blank"
-                href="https://github.com/Floriani-Sharp/gpt-link/blob/main#readme"
+                href="https://github.com/Floriani-Sharp/gpt-link#readme"
                 className="text-[#0e76a8] text-sm font-medium">
                 En savoir plus
               </a>
