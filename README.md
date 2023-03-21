@@ -1,33 +1,36 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Chrome Extension to Enhance Productivity Based on ChatGPT (Case of LinkedIn)
 
-## Getting Started
+## Description
 
-First, run the development server:
+This Chrome extension was developed to enhance the productivity of professionals on LinkedIn by allowing them to publish relevant content in less time. The extension uses the natural language processing model ChatGPT developed by OpenAI to suggest relevant topics for posts and comments based on the user's search history and preferences. It also allows the user to customize search results based on their preferences.
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+## Installation Instructions
+**Google Chrome** (Custom sites supported)
+1. Download this repo as a [ZIP file from GitHub](https://github.com/Floriani-Sharp/gpt-link/archive/refs/heads/main.zip).
+1. Unzip the file and you should have a folder named `gpt-link-master`.
+1. In Chrome go to the extensions page (`chrome://extensions`).
+1. Enable Developer Mode.
+1. Drag the `gpt-link-master` folder anywhere on the page to import it (do not delete the folder afterwards).
+## Features
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+- Analyzes previous posts and comments to suggest relevant topics and themes for future posts.
+- Customizes suggestions based on the user's quality and relevance criteria.
+- Sets filters to exclude topics that do not match their personal brand.
+- Suggests post topics based on the user's search history and preferences.
+- Suggests relevant comments based on the content and tone of the post.
+- Customizes search filters to refine results based on the user's preferences.
+- Explains technical terms or acronyms used in posts to improve understanding.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+## Technologies Used
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+- ChatGPT, a natural language processing model developed by OpenAI.
+- Plasmo, an application programming interface for Chrome extension development.
+- HTML, CSS, and JavaScript for designing and laying out the extension's user interface.
 
-## Making production build
+## Author
 
-Run the following:
+Amadeus Friant Fleury TIGRI
 
-```bash
-pnpm build
-# or
-npm run build
-```
+## Version 0.0.1
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
-
-## Submit to the webstores
-
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+March 21, 2023
