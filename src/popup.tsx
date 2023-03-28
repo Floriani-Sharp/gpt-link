@@ -1,11 +1,8 @@
 import Logo from "data-base64:~/assets/icon.png"
-import { useState } from "react"
 
 import "./style.css"
 
-const IndexPopup = () => {
-  const [data, setData] = useState("")
-
+function IndexPopup() {
   return (
     <section className="shadow-md border-gray-200 border-1 w-96">
       <header className="p-5 bg-gray-200/20 flex justify-between">
