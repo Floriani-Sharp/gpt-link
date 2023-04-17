@@ -1,11 +1,4 @@
 import type { PlasmoCSConfig } from "plasmo";
-import { Configuration, OpenAIApi } from "openai";
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
- 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.linkedin.com/*"],
 }
