@@ -2,7 +2,7 @@
 
 ## Description
 
-This Chrome extension was developed to enhance the productivity of professionals on LinkedIn by allowing them to publish relevant content in less time. The extension uses the natural language processing model ChatGPT developed by OpenAI to suggest relevant topics for posts and comments based on the user's search history and preferences. It also allows the user to customize search results based on their preferences.
+This Chrome extension, developed by Amadeus Friant Fleury TIGRI as part of their Master's thesis, was created to enhance the productivity of professionals on LinkedIn by allowing them to publish relevant content in less time. The extension uses the natural language processing model ChatGPT, developed by OpenAI, to suggest relevant topics for posts and comments based on the user's search history and preferences. It also allows the user to customize search results based on their preferences.
 
 ## Installation Instructions
 **Google Chrome** (Custom sites supported)
