@@ -1,8 +1,14 @@
 import type { PlasmoCSConfig } from "plasmo";
+import { Configuration, OpenAIApi } from "openai";
+import Loading from "data-base64:~/assets/loading.gif";
+const configuration = new Configuration({
+  apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 export const config: PlasmoCSConfig = {
   matches: ["https://www.linkedin.com/*"],
 }
-
+console.log("process.env.OPENAI_API_KEY", process.env.PLASMO_PUBLIC_OPENAI_API_KEY);
 let showContextMenu = true;
 let termToExplain = "";
 let contextOfTerm = "";
@@ -24,8 +30,11 @@ EXPLAIN_TOOL.style.borderRadius= "0.375rem"
 EXPLAIN_TOOL.style.cursor= "pointer"
 EXPLAIN_TOOL.style.zIndex = "999";
 
+let EXPLAIN_TOOL_CONTENT = EXPLAIN_TOOL.innerHTML;
+
 // Get the term and the text that contains it
 document.addEventListener("selectionchange", () => {
+  EXPLAIN_TOOL.innerHTML = EXPLAIN_TOOL_CONTENT;
   const selection = window.getSelection();
   if (showContextMenu){
     if (selection.toString().length) {
@@ -88,31 +97,49 @@ EXPLANATION.style.boxShadow = "2px 2px 5px rgba(0,0,0,.2)";
 EXPLANATION.style.transform = "translate(-50%, -50%)";
 EXPLANATION.style.zIndex = "999";
 
-
+let isLoading = false;
 // Adds the popup to the parent element
-EXPLAIN_TOOL.addEventListener('click', function() {
-
-  // Request to get explanation
-  const REQUEST = ExplainTerms();
-
-  console.log("Request", REQUEST)
-  const RESULT = `<p>CoffeeScript est un langage de programmation qui compile en JavaScript, créé par Jeremy Ashkenas. Backbone quant à lui, est une librairie JavaScript qui permet de structurer les applications en utilisant le modèle MVC.</p>
-  <ul style="padding-left: 10px;">
-    <li>CoffeeScript permet d'écrire du code JavaScript plus rapidement et plus efficacement.</li>
-    <li>Backbone facilite la création d'applications web en fournissant des outils pour organiser le code.</li>
-    <li>En utilisant CoffeeScript avec Backbone, il est possible de créer des applications web rapidement et facilement.</li>
-  </ul>
-  <p>Pour en savoir plus sur CoffeeScript et Backbone, consultez le site officiel de CoffeeScript à l'adresse <a href="https://coffeescript.org/">https://coffeescript.org/</a>.</p>`
-
-  // Adds relevant text and links to the pop-up window
-  EXPLANATION.innerHTML = `
-    <strong>${termToExplain}</strong>
-    ${RESULT}
-  `;
-
-  showContextMenu= false;
-  document.body.appendChild(BACKGROUND_EXPLANATION);
-  document.body.appendChild(EXPLANATION);
+EXPLAIN_TOOL.addEventListener('click', async function () {
+  if(!isLoading){
+    isLoading = true;
+    const LoadingIcon  = document.createElement("img");
+    LoadingIcon .src = Loading;
+    LoadingIcon .alt = "Reformuler";
+    LoadingIcon .title = "Reformuler un commentaire";
+    LoadingIcon .style.height = "20px";
+    EXPLAIN_TOOL.innerHTML = ``;
+    EXPLAIN_TOOL.appendChild(LoadingIcon);
+    if (!configuration.apiKey) {
+      throw new Error("OpenAI API key not configured");
+    }
+  
+    if (termToExplain.trim().length === 0 || contextOfTerm.trim().length === 0) {
+      throw new Error("Please enter a valid term");
+    }
+  
+    try {
+      await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: generatePrompt(termToExplain, contextOfTerm),
+        temperature: 0,
+        max_tokens: 500,
+      }).then((explanation)=>{
+        console.log("explanation", explanation.data.choices[0].text);
+        // Adds relevant text and links to the pop-up window
+        EXPLANATION.innerHTML = `
+          <strong>${termToExplain}</strong> <br/>
+          ${explanation.data.choices[0].text}
+        `;
+      })
+      EXPLAIN_TOOL.innerHTML = EXPLAIN_TOOL_CONTENT;
+    } catch(error) {
+      EXPLAIN_TOOL.innerHTML = "Une erreur est survenue";
+    }
+    isLoading = false;
+    showContextMenu= false;
+    document.body.appendChild(BACKGROUND_EXPLANATION);
+    document.body.appendChild(EXPLANATION);
+  }
 });
 
 // Remove the popup
@@ -123,26 +150,13 @@ BACKGROUND_EXPLANATION.addEventListener('click', function() {
   document.body.removeChild(EXPLANATION);
 });
 
-
-async function ExplainTerms() {
-  try {
-    const response = await fetch("/api/explain-terms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ term: termToExplain, context: contextOfTerm }),
-    });
-
-    const data = await response.json();
-    console.log("result", data);
-    if (response.status !== 200) {
-      throw data.error || new Error(`Request failed with status ${response.status}`);
-    }
-
-  } catch(error) {
-    // Consider implementing your own error handling logic here
-    console.error(error);
-    // alert(error.message);
-  }
+function generatePrompt(term,context) {
+  return `
+    Pouvez-vous me fournir une explication concise, en français, du terme "${term}" dans le contexte "${context}" ? 
+    Veuillez inclure 3 exemples d'utilisation sous forme de liste à puces, 
+    ainsi qu'un lien externe (ouvre un nouvel onglet) pour en savoir plus. 
+    Merci de formater votre réponse en utilisant des balises HTML. 
+    La réponse ne doit pas dépasser 70 mots.
+  `;
 }
+alert("RESULT")
