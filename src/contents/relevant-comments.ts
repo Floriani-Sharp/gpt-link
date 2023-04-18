@@ -8,74 +8,146 @@ export const config: PlasmoCSConfig = {
 
 // Add comments tools icons
 const AddCommentsTools = () => {
-  const COMMENT_BOXS = document.querySelectorAll(
+  const commentBoxes = document.querySelectorAll(
     ".comments-comment-box-comment__text-editor + .display-flex.mlA"
   );
   // Loop through each element and remove it
-  let index = 0;
-  COMMENT_BOXS.forEach((commentBox) => {
+  commentBoxes.forEach((commentBox) => {
     if(commentBox.childElementCount !== 3){
-      const COMMENTS_TOOLS = document.createElement("ul");
+      const commentsTools = document.createElement("ul");
 
-      const SUGGEST_A_COMMENT = document.createElement("li");
-      SUGGEST_A_COMMENT.style.display = "flex";
-      SUGGEST_A_COMMENT.style.alignItems = "center";
-      SUGGEST_A_COMMENT.style.padding = "0 8px";
-      SUGGEST_A_COMMENT.style.height = "24px";
-      SUGGEST_A_COMMENT.style.cursor = "pointer";
+      const suggestComment = document.createElement("li");
+      suggestComment.style.display = "flex";
+      suggestComment.style.alignItems = "center";
+      suggestComment.style.padding = "0 8px";
+      suggestComment.style.height = "24px";
+      suggestComment.style.cursor = "pointer";
 
-      const LIGHT_ICON = document.createElement("img");
-      LIGHT_ICON.src = Light;
-      LIGHT_ICON.alt = "Suggérer";
-      LIGHT_ICON.title = "Suggérer un commentaire";
-      LIGHT_ICON.style.height = "20px";
-      LIGHT_ICON.onclick = function () {
-        const COMMENT_INPUT = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
-        COMMENT_INPUT.innerHTML = "SUGGEST_A_COMMENT";
+      const lightIcon = document.createElement("img");
+      lightIcon.src = Light;
+      lightIcon.alt = "Suggérer";
+      lightIcon.title = "Suggérer un commentaire";
+      lightIcon.style.height = "20px";
+      lightIcon.onclick = function () {
+        const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
+        commentInput.innerHTML = "suggestComment";
       };
 
-      SUGGEST_A_COMMENT.appendChild(LIGHT_ICON);
+      suggestComment.appendChild(lightIcon);
 
-      const REPHRASE_A_COMMENT = document.createElement("li");
-      REPHRASE_A_COMMENT.style.display = "flex";
-      REPHRASE_A_COMMENT.style.alignItems = "center";
-      REPHRASE_A_COMMENT.style.padding = "0 8px";
-      REPHRASE_A_COMMENT.style.height = "24px";
-      REPHRASE_A_COMMENT.style.cursor = "pointer";
+      const rephraseComment  = document.createElement("li");
+      rephraseComment .style.display = "flex";
+      rephraseComment .style.alignItems = "center";
+      rephraseComment .style.padding = "0 8px";
+      rephraseComment .style.height = "24px";
+      rephraseComment .style.cursor = "pointer";
 
-      const PENCIL_ICON = document.createElement("img");
-      PENCIL_ICON.src = Pencil;
-      PENCIL_ICON.alt = "Reformuler";
-      PENCIL_ICON.title = "Reformuler un commentaire";
-      PENCIL_ICON.style.height = "20px";
-      PENCIL_ICON.onclick = function () {
-        const PUBLICATION = commentBox.closest(".social-details-social-activity").parentNode;
-        console.log("PUBLICATION", PUBLICATION);
-        let publicationParent = PUBLICATION;
-        if(PUBLICATION.querySelector(".update-components-text.feed-shared-update-v2__commentary ") === null){
-          publicationParent = (PUBLICATION as HTMLElement).closest(".social-details-social-activity").parentNode;
-        }
-        const PUBLICATION_CONTENT  = publicationParent.querySelector(".update-components-text.feed-shared-update-v2__commentary ").textContent;
-        console.log("PUBLICATION_CONTENT", PUBLICATION_CONTENT);
+      const pencilIcon  = document.createElement("img");
+      pencilIcon .src = Pencil;
+      pencilIcon .alt = "Reformuler";
+      pencilIcon .title = "Reformuler un commentaire";
+      pencilIcon .style.height = "20px";
+      pencilIcon .onclick = function () {
+        const publication = commentBox.closest(".social-details-social-activity").parentNode;
         
-        const COMMENT_INPUT = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
-        COMMENT_INPUT.innerHTML = "REPHRASE_A_COMMENT";
+        let publicationParent = publication;
+        let replies = []
+        let principalComment;
+
+        if(publication.querySelector(".update-components-text.feed-shared-update-v2__commentary ") === null){
+          let comment =  publication.querySelector(".comments-comment-item-content-body.break-words");
+          if(comment === null){
+            comment =  publication.querySelector(".comments-highlighted-comment-item-content-body.break-words")
+          }
+          principalComment = {
+            name: publication.querySelector(".comments-post-meta__name-text.hoverable-link-text").textContent.replace(/\s+/g, ' ').trim(),
+            content: comment.textContent.replace(/\s+/g, ' ').trim()
+          };
+
+          let listComments = publication.querySelectorAll(".social-details-social-activity.comment-social-activity article")
+          listComments.forEach(comment => {
+            replies.push({
+              name: comment.querySelector(".comments-post-meta__name-text.hoverable-link-text").textContent.replace(/\s+/g, ' ').trim(),
+              content: comment.querySelector(".comments-reply-item-content-body.break-words").textContent.replace(/\s+/g, ' ').trim()
+            })
+          });
+
+          publicationParent = (publication as HTMLElement).closest(".social-details-social-activity").parentNode;
+        }
+
+        const publicationContent  = publicationParent.querySelector(".update-components-text.feed-shared-update-v2__commentary").textContent.replace(/\s+/g, ' ').trim();
+        const publicationAuthor  = publicationParent.querySelector(".update-components-actor__title").textContent.replace(/\s+/g, ' ').trim();
+        const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
+        let replyTo = commentInput.textContent; 
+        let filter = (document.getElementById("gpt_link_select_input") as HTMLInputElement).value;
+        let prompt = generateCommentPrompt(publicationAuthor, publicationContent, filter,principalComment,replies, replyTo)
+        commentInput.innerHTML = "rephraseComment ";
       };
-      REPHRASE_A_COMMENT.appendChild(PENCIL_ICON);
-
-      COMMENTS_TOOLS.style.display = "inline-flex";
-      COMMENTS_TOOLS.style.listStyleType = "none";
-      COMMENTS_TOOLS.style.paddingTop = "8px";
-      COMMENTS_TOOLS.appendChild(SUGGEST_A_COMMENT);
-      COMMENTS_TOOLS.appendChild(REPHRASE_A_COMMENT);
-
-      commentBox.insertBefore(COMMENTS_TOOLS, commentBox.firstChild);
+      rephraseComment .appendChild(pencilIcon );
+      commentsTools.style.display = "inline-flex";
+      commentsTools.style.listStyleType = "none";
+      commentsTools.style.paddingTop = "8px";
+      commentsTools.appendChild(suggestComment);
+      commentsTools.appendChild(rephraseComment );
+      commentBox.insertBefore(commentsTools, commentBox.firstChild);
     }
-    index+=1;
   });
 };
 
+function generateCommentPrompt(author, content, filter, parentComment = null, subComments = [], suggestedAuthor = '') {
+  let prompt = `Bonjour ChatGPT, sur LinkedIn, l'auteur ${author} a publié : "${content}".`;
+  
+  console.log("parentComment", parentComment);
+  if (parentComment !== null) {
+    prompt += `Cette publication a reçu l'avis de ${parentComment.name} qui a exprimé son point de vue comme suit : "${parentComment.content}". `;
+    if (suggestedAuthor === '') {
+      suggestedAuthor = parentComment.name;
+    }
+  }
+  
+  // Ajouter les sous-commentaires
+  if (subComments.length > 0) {
+    prompt += "Voici les commentaires qu'il a reçus : ";
+    subComments.forEach((commentaire) => {
+      prompt += `Pour ${commentaire.name} : "${commentaire.content}" `;
+    });
+  }
 
+  prompt += `J'aimerais donc avoir une suggestion de commentaire pour `;
+  switch (filter) {
+    case 'Avis positif':
+      prompt += 'exprimer un avis positif. ';
+      break;
+    case 'Avis négatif':
+      prompt += 'exprimer un avis négatif. ';
+      break;
+    case 'Féliciter':
+      prompt += 'féliciter. ';
+      break;
+    case 'Poser une question':
+      prompt += 'poser une question. ';
+      break;
+    case 'Partager une expérience':
+      prompt += 'partager mon expérience. ';
+      break;
+    case 'Contribuer':
+      prompt += 'apporter ma contribution. ';
+      break;
+    case 'Suggérer':
+      prompt += 'suggérer une amélioration. ';
+      break;
+    default:
+      prompt += 'réagir à ce propos. ';
+      break;
+  }
+    
+  if (suggestedAuthor !== '') {
+    prompt += `Je voudrais que ce commentaire soit adressé à ${suggestedAuthor}. `;
+  }
+  prompt += 'Propose-moi un commentaire qui comporte moins de 200 mots. La réponse commence directement par le commentaire. Merci beaucoup ChatGPT!';
+  
+  return prompt;
+}
 
 // Create a new observer instance
 const observer = new MutationObserver((mutationsList, observer) => {
@@ -85,11 +157,9 @@ const observer = new MutationObserver((mutationsList, observer) => {
     const target = mutation.target;
     if (target === document.body || (target instanceof Element && 
         target.matches('.feed-shared-update-v2__comments-container, .comments-comment-item__nested-items'))) {
-      // Execute your action here
       AddCommentsTools();
     }
   }
 });
-
 // Start observing changes to the body and comments container
 observer.observe(document.body, { subtree: true, childList: true });

@@ -31,7 +31,7 @@ container.style.position = "relative";
 
 let input = document.createElement("input");
 input.type = "text";
-input.id = "select-input";
+input.id = "gpt_link_select_input";
 input.value = options[0];
 input.onclick = function() {
   if (gpt_filters.style.display === "none") {
