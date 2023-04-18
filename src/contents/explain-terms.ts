@@ -143,6 +143,6 @@ async function ExplainTerms() {
   } catch(error) {
     // Consider implementing your own error handling logic here
     console.error(error);
-    alert(error.message);
+    // alert(error.message);
   }
 }

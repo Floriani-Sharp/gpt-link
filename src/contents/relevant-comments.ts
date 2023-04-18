@@ -50,8 +50,14 @@ const AddCommentsTools = () => {
       PENCIL_ICON.style.height = "20px";
       PENCIL_ICON.onclick = function () {
         const PUBLICATION = commentBox.closest(".social-details-social-activity").parentNode;
-        const PUBLICATION_CONTENT  = PUBLICATION.querySelector(".update-components-text.feed-shared-update-v2__commentary ").textContent;
+        console.log("PUBLICATION", PUBLICATION);
+        let publicationParent = PUBLICATION;
+        if(PUBLICATION.querySelector(".update-components-text.feed-shared-update-v2__commentary ") === null){
+          publicationParent = (PUBLICATION as HTMLElement).closest(".social-details-social-activity").parentNode;
+        }
+        const PUBLICATION_CONTENT  = publicationParent.querySelector(".update-components-text.feed-shared-update-v2__commentary ").textContent;
         console.log("PUBLICATION_CONTENT", PUBLICATION_CONTENT);
+        
         const COMMENT_INPUT = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
         COMMENT_INPUT.innerHTML = "REPHRASE_A_COMMENT";
       };
