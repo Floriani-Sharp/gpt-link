@@ -8,7 +8,6 @@ const openai = new OpenAIApi(configuration);
 export const config: PlasmoCSConfig = {
   matches: ["https://www.linkedin.com/*"],
 }
-console.log("process.env.OPENAI_API_KEY", process.env.PLASMO_PUBLIC_OPENAI_API_KEY);
 let showContextMenu = true;
 let termToExplain = "";
 let contextOfTerm = "";
@@ -124,7 +123,6 @@ EXPLAIN_TOOL.addEventListener('click', async function () {
         temperature: 0,
         max_tokens: 500,
       }).then((explanation)=>{
-        console.log("explanation", explanation.data.choices[0].text);
         // Adds relevant text and links to the pop-up window
         EXPLANATION.innerHTML = `
           <strong>${termToExplain}</strong> <br/>
