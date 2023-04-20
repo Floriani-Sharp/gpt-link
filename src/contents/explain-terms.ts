@@ -1,16 +1,20 @@
 import type { PlasmoCSConfig } from "plasmo";
 import { Configuration, OpenAIApi } from "openai";
 import Loading from "data-base64:~/assets/loading.gif";
+
 const configuration = new Configuration({
   apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
+
 export const config: PlasmoCSConfig = {
   matches: ["https://www.linkedin.com/*"],
 }
+
 let showContextMenu = true;
 let termToExplain = "";
 let contextOfTerm = "";
+let isLoading = false;
 
 // Create the context menu 
 
@@ -96,24 +100,19 @@ EXPLANATION.style.boxShadow = "2px 2px 5px rgba(0,0,0,.2)";
 EXPLANATION.style.transform = "translate(-50%, -50%)";
 EXPLANATION.style.zIndex = "999";
 
-let isLoading = false;
 // Adds the popup to the parent element
 EXPLAIN_TOOL.addEventListener('click', async function () {
   if(!isLoading){
     isLoading = true;
     const LoadingIcon  = document.createElement("img");
     LoadingIcon .src = Loading;
-    LoadingIcon .alt = "Reformuler";
-    LoadingIcon .title = "Reformuler un commentaire";
+    LoadingIcon .alt = "En cours";
+    LoadingIcon .title = "En cours";
     LoadingIcon .style.height = "20px";
     EXPLAIN_TOOL.innerHTML = ``;
     EXPLAIN_TOOL.appendChild(LoadingIcon);
     if (!configuration.apiKey) {
       throw new Error("OpenAI API key not configured");
-    }
-  
-    if (termToExplain.trim().length === 0 || contextOfTerm.trim().length === 0) {
-      throw new Error("Please enter a valid term");
     }
   
     try {
@@ -123,7 +122,6 @@ EXPLAIN_TOOL.addEventListener('click', async function () {
         temperature: 0,
         max_tokens: 500,
       }).then((explanation)=>{
-        // Adds relevant text and links to the pop-up window
         EXPLANATION.innerHTML = `
           <strong>${termToExplain}</strong> <br/>
           ${explanation.data.choices[0].text}
@@ -157,4 +155,3 @@ function generatePrompt(term,context) {
     La réponse ne doit pas dépasser 70 mots.
   `;
 }
-alert("RESULT")

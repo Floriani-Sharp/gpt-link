@@ -1,11 +1,18 @@
 import type { PlasmoCSConfig } from "plasmo";
 import Light from "data-base64:~/assets/light.svg";
 import Pencil from "data-base64:~/assets/pencil.svg";
+import { Configuration, OpenAIApi } from "openai";
+import Loading from "data-base64:~/assets/loading.gif";
+
+const configuration = new Configuration({
+  apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
  
 export const config: PlasmoCSConfig = {
   matches: ["https://www.linkedin.com/*"],
 }
-
+let isLoading = false;
 // Add comments tools icons
 const AddCommentsTools = () => {
   const commentBoxes = document.querySelectorAll(
@@ -28,9 +35,68 @@ const AddCommentsTools = () => {
       lightIcon.alt = "Suggérer";
       lightIcon.title = "Suggérer un commentaire";
       lightIcon.style.height = "20px";
-      lightIcon.onclick = function () {
-        const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
-        commentInput.innerHTML = "suggestComment";
+      lightIcon.onclick = async function () {
+        if(!isLoading){
+          isLoading = true;
+          const LoadingIcon  = document.createElement("img");
+          LoadingIcon .src = Loading;
+          LoadingIcon .alt = "En cours";
+          LoadingIcon .title = "En cours";
+          LoadingIcon .style.height = "20px";
+          commentsTools.insertBefore(LoadingIcon, commentsTools.firstChild);
+
+          if (!configuration.apiKey) {
+            throw new Error("OpenAI API key not configured");
+          }
+          const publication = commentBox.closest(".social-details-social-activity").parentNode;
+          
+          let publicationParent = publication;
+          let replies = []
+          let principalComment;
+  
+          if(publication.querySelector(".update-components-text.feed-shared-update-v2__commentary ") === null){
+            let comment =  publication.querySelector(".comments-comment-item-content-body.break-words");
+            if(comment === null){
+              comment =  publication.querySelector(".comments-highlighted-comment-item-content-body.break-words")
+            }
+            principalComment = {
+              name: publication.querySelector(".comments-post-meta__name-text.hoverable-link-text").textContent.replace(/\s+/g, ' ').trim(),
+              content: comment.textContent.replace(/\s+/g, ' ').trim()
+            };
+  
+            let listComments = publication.querySelectorAll(".social-details-social-activity.comment-social-activity article")
+            listComments.forEach(comment => {
+              replies.push({
+                name: comment.querySelector(".comments-post-meta__name-text.hoverable-link-text").textContent.replace(/\s+/g, ' ').trim(),
+                content: comment.querySelector(".comments-reply-item-content-body.break-words").textContent.replace(/\s+/g, ' ').trim()
+              })
+            });
+  
+            publicationParent = (publication as HTMLElement).closest(".social-details-social-activity").parentNode;
+          }
+  
+          const publicationContent  = publicationParent.querySelector(".update-components-text.feed-shared-update-v2__commentary").textContent.replace(/\s+/g, ' ').trim();
+          const publicationAuthor  = publicationParent.querySelector(".update-components-actor__title").textContent.replace(/\s+/g, ' ').trim();
+          const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
+          let replyTo = commentInput.textContent; 
+          let filter = (document.getElementById("gpt_link_select_input") as HTMLInputElement).value;
+          let prompt = generateCommentPrompt(publicationAuthor, publicationContent, filter,principalComment,replies, replyTo)
+            
+          try {
+            await openai.createCompletion({
+              model: "text-davinci-003",
+              prompt: prompt,
+              temperature: 0,
+              max_tokens: 500,
+            }).then((explanation)=>{
+              commentInput.innerHTML =`${explanation.data.choices[0].text.replaceAll("\n\n", "")}`;
+            })
+          } catch(error) {
+            commentInput.innerHTML = "Une erreur est survenue";
+          }
+          isLoading = false;
+          commentsTools.removeChild(LoadingIcon);
+        }
       };
 
       suggestComment.appendChild(lightIcon);
@@ -47,41 +113,36 @@ const AddCommentsTools = () => {
       pencilIcon .alt = "Reformuler";
       pencilIcon .title = "Reformuler un commentaire";
       pencilIcon .style.height = "20px";
-      pencilIcon .onclick = function () {
-        const publication = commentBox.closest(".social-details-social-activity").parentNode;
-        
-        let publicationParent = publication;
-        let replies = []
-        let principalComment;
+      pencilIcon .onclick = async function () {
+        if(!isLoading){
+          isLoading = true;
+          const LoadingIcon  = document.createElement("img");
+          LoadingIcon .src = Loading;
+          LoadingIcon .alt = "En cours";
+          LoadingIcon .title = "En cours";
+          LoadingIcon .style.height = "20px";
+          commentsTools.insertBefore(LoadingIcon, commentsTools.firstChild);
 
-        if(publication.querySelector(".update-components-text.feed-shared-update-v2__commentary ") === null){
-          let comment =  publication.querySelector(".comments-comment-item-content-body.break-words");
-          if(comment === null){
-            comment =  publication.querySelector(".comments-highlighted-comment-item-content-body.break-words")
+          if (!configuration.apiKey) {
+            throw new Error("OpenAI API key not configured");
           }
-          principalComment = {
-            name: publication.querySelector(".comments-post-meta__name-text.hoverable-link-text").textContent.replace(/\s+/g, ' ').trim(),
-            content: comment.textContent.replace(/\s+/g, ' ').trim()
-          };
-
-          let listComments = publication.querySelectorAll(".social-details-social-activity.comment-social-activity article")
-          listComments.forEach(comment => {
-            replies.push({
-              name: comment.querySelector(".comments-post-meta__name-text.hoverable-link-text").textContent.replace(/\s+/g, ' ').trim(),
-              content: comment.querySelector(".comments-reply-item-content-body.break-words").textContent.replace(/\s+/g, ' ').trim()
+          const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
+            
+          try {
+            await openai.createCompletion({
+              model: "text-davinci-003",
+              prompt: `Bonjour ChatGPT, reformule moi ce commentaire à poster sur LinkedIn "${commentInput.textContent}"`,
+              temperature: 0,
+              max_tokens: 500,
+            }).then((explanation)=>{
+              commentInput.innerHTML =`${explanation.data.choices[0].text.replaceAll("\n\n", "")}`;
             })
-          });
-
-          publicationParent = (publication as HTMLElement).closest(".social-details-social-activity").parentNode;
+          } catch(error) {
+            commentInput.innerHTML = "Une erreur est survenue";
+          }
+          isLoading = false;
+          commentsTools.removeChild(LoadingIcon);
         }
-
-        const publicationContent  = publicationParent.querySelector(".update-components-text.feed-shared-update-v2__commentary").textContent.replace(/\s+/g, ' ').trim();
-        const publicationAuthor  = publicationParent.querySelector(".update-components-actor__title").textContent.replace(/\s+/g, ' ').trim();
-        const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
-        let replyTo = commentInput.textContent; 
-        let filter = (document.getElementById("gpt_link_select_input") as HTMLInputElement).value;
-        let prompt = generateCommentPrompt(publicationAuthor, publicationContent, filter,principalComment,replies, replyTo)
-        commentInput.innerHTML = "rephraseComment ";
       };
       rephraseComment .appendChild(pencilIcon );
       commentsTools.style.display = "inline-flex";
@@ -144,7 +205,7 @@ function generateCommentPrompt(author, content, filter, parentComment = null, su
   if (suggestedAuthor !== '') {
     prompt += `Je voudrais que ce commentaire soit adressé à ${suggestedAuthor}. `;
   }
-  prompt += 'Propose-moi un commentaire qui comporte moins de 200 mots. La réponse commence directement par le commentaire. Merci beaucoup ChatGPT!';
+  prompt += `Propose-moi un commentaire qui comporte moins de 200 mots. Merci beaucoup ChatGPT!`;
   
   return prompt;
 }
@@ -163,3 +224,5 @@ const observer = new MutationObserver((mutationsList, observer) => {
 });
 // Start observing changes to the body and comments container
 observer.observe(document.body, { subtree: true, childList: true });
+
+alert("TEST 5")

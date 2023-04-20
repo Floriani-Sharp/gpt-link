@@ -4,6 +4,7 @@ export const config: PlasmoCSConfig = {
   matches: ["https://www.linkedin.com/*"],
 }
 
+let isLoading = false;
 // Création de l'élément nav
 const nav = document.createElement('nav');
 nav.style.display = 'flex';
