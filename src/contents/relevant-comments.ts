@@ -96,7 +96,7 @@ const AddCommentsTools = () => {
                 localStorage.setItem("gptSuggestion", gptSuggestion.join("[GPT-Link]") )
               }
               else{
-                localStorage.setItem("gptSuggestion", gptExplanation + "[GPT-Link]");
+                localStorage.setItem("gptSuggestion", gptExplanation);
               }
               commentInput.innerHTML =`${gptExplanation}`;
             })
