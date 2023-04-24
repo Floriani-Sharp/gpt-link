@@ -89,7 +89,16 @@ const AddCommentsTools = () => {
               temperature: 0,
               max_tokens: 500,
             }).then((explanation)=>{
-              commentInput.innerHTML =`${explanation.data.choices[0].text.replaceAll("\n\n", "")}`;
+              const gptExplanation = explanation.data.choices[0].text.replaceAll("\n\n", "");
+              if(localStorage.getItem("gptSuggestion")){
+                let gptSuggestion = localStorage.getItem("gptSuggestion").split("[GPT-Link]");
+                gptSuggestion.push(gptExplanation);
+                localStorage.setItem("gptSuggestion", gptSuggestion.join("[GPT-Link]") )
+              }
+              else{
+                localStorage.setItem("gptSuggestion", gptExplanation + "[GPT-Link]");
+              }
+              commentInput.innerHTML =`${gptExplanation}`;
             })
           } catch(error) {
             commentInput.innerHTML = "Une erreur est survenue";
@@ -135,7 +144,16 @@ const AddCommentsTools = () => {
               temperature: 0,
               max_tokens: 500,
             }).then((explanation)=>{
-              commentInput.innerHTML =`${explanation.data.choices[0].text.replaceAll("\n\n", "")}`;
+              const gptExplanation = explanation.data.choices[0].text.replaceAll("\n\n", "");
+              if(localStorage.getItem("gptSuggestion")){
+                let gptSuggestion = localStorage.getItem("gptSuggestion").split("[GPT-Link]");
+                gptSuggestion.push(gptExplanation);
+                localStorage.setItem("gptSuggestion", gptSuggestion.join("[GPT-Link]") )
+              }
+              else{
+                localStorage.setItem("gptSuggestion", gptExplanation + "[GPT-Link]");
+              }
+              commentInput.innerHTML =`${gptExplanation}`;
             })
           } catch(error) {
             commentInput.innerHTML = "Une erreur est survenue";
@@ -158,7 +176,6 @@ const AddCommentsTools = () => {
 function generateCommentPrompt(author, content, filter, parentComment = null, subComments = [], suggestedAuthor = '') {
   let prompt = `Bonjour ChatGPT, sur LinkedIn, l'auteur ${author} a publié : "${content}".`;
   
-  console.log("parentComment", parentComment);
   if (parentComment !== null) {
     prompt += `Cette publication a reçu l'avis de ${parentComment.name} qui a exprimé son point de vue comme suit : "${parentComment.content}". `;
     if (suggestedAuthor === '') {
@@ -224,5 +241,3 @@ const observer = new MutationObserver((mutationsList, observer) => {
 });
 // Start observing changes to the body and comments container
 observer.observe(document.body, { subtree: true, childList: true });
-
-alert("TEST 5")

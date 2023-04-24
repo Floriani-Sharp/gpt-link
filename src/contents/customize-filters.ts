@@ -99,34 +99,6 @@ LIST_SUGGESTION.style.backgroundColor = "white";
 LIST_SUGGESTION.style.maxWidth = "200px";
 LIST_SUGGESTION.style.padding = "5px";
 
-const SUGGESTIONS = [
-  `Merci beaucoup pour votre commentaire ! Nous sommes ravis que vous ayez apprécié notre contenu et nous espérons continuer à vous proposer des publications intéressantes à l'avenir.`,
-  `Je vous remercie pour votre commentaire et je tiens à préciser que notre entreprise ne propose pas encore cette fonctionnalité. Nous sommes toutefois conscients de son importance pour nos clients et nous sommes en train d'étudier la possibilité de l'ajouter à notre offre à l'avenir.`,
-  `Je vous remercie pour votre commentaire et votre intérêt pour notre entreprise. Pour répondre à votre question, oui, nous avons récemment lancé une nouvelle gamme de produits qui a connu un grand succès auprès de nos clients. N'hésitez pas à nous contacter pour en savoir plus sur cette offre ou pour toute autre question que vous pourriez avoir.`,
-];
-
-for (let i = 0; i < SUGGESTIONS.length; i++) {
-  let li = document.createElement("li");
-  li.innerHTML = SUGGESTIONS[i];
-  li.title = `${i+1}. ${SUGGESTIONS[i]}`
-  li.style.padding = "5px";
-  li.style.cursor = "pointer";
-  li.style.display = '-webkit-box';
-  li.style.webkitLineClamp = '3';
-  li.style.webkitBoxOrient = 'vertical';
-  li.style.overflow = 'hidden';
-  li.onmouseover = function() {
-    li.style.backgroundColor = "#f6f6f6";
-  };
-  li.onmouseout = function() {
-    li.style.backgroundColor = "white";
-  };
-  li.onclick = function() {
-    LIST_SUGGESTION.style.display = "none";
-  };
-  LIST_SUGGESTION.appendChild(li);
-}
-
 // Ajout de la balise ul à l'élément article
 article.appendChild(LIST_SUGGESTION);
 
@@ -161,8 +133,41 @@ label.appendChild(svg);
 
 // Toggle the suggestions visibility when we click on "Afficher les suggestions" label or the svg
 const toggleSuggestions = () => {
+  LIST_SUGGESTION.innerHTML = "";
+  if(localStorage.getItem("gptSuggestion")){
+    const SUGGESTIONS = localStorage.getItem("gptSuggestion").split("[GPT-Link]");
+    LIST_SUGGESTION.style.listStyleType = "decimal";
+    for (let i = 0; i < SUGGESTIONS.length; i++) {
+      let li = document.createElement("li");
+      li.innerHTML = SUGGESTIONS[i];
+      li.title = `${i+1}. ${SUGGESTIONS[i]}`
+      li.style.padding = "5px";
+      li.style.cursor = "pointer";
+      li.style.display = '-webkit-box';
+      li.style.webkitLineClamp = '3';
+      li.style.webkitBoxOrient = 'vertical';
+      li.style.overflow = 'hidden';
+      li.onmouseover = function() {
+        li.style.backgroundColor = "#f6f6f6";
+      };
+      li.onmouseout = function() {
+        li.style.backgroundColor = "white";
+      };
+      li.onclick = function() {
+        navigator.clipboard.writeText(li.innerHTML);
+        alert(`Copié dans le presse-pappier : ${li.innerHTML}`)
+        LIST_SUGGESTION.style.display = "none";
+      };
+      LIST_SUGGESTION.appendChild(li);
+    }
+  }
+  else{
+    LIST_SUGGESTION.style.listStyleType = "none";
+    let li = document.createElement("li");
+    li.innerHTML = "Aucune suggestion";
+    LIST_SUGGESTION.appendChild(li);
+  }
   LIST_SUGGESTION.style.display = LIST_SUGGESTION.style.display === 'none' ? 'block' : 'none'; // toggle display state
-  // path.setAttribute('d', LIST_SUGGESTION.style.display === 'none' ? 'M19.5 8.25l-7.5 7.5-7.5-7.5' : 'M19.5 15.75l-7.5-7.5-7.5 7.5'); // reverse svg arrow
 };
 
 label.addEventListener('click', toggleSuggestions);
