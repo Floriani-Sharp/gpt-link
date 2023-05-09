@@ -1,0 +1,96 @@
+import type { PlasmoCSConfig } from "plasmo";
+import { Configuration, OpenAIApi } from "openai";
+
+const configuration = new Configuration({
+  apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+ 
+export const config: PlasmoCSConfig = {
+  matches: ["https://www.linkedin.com/feed/*"],
+}
+
+// Step 4: Redirect the user to LinkedIn's authorization page
+const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.PLASMO_PUBLIC_CLIENT_ID}&redirect_uri=${process.env.PLASMO_PUBLIC_REDIRECT_URI}&scope=${process.env.PLASMO_PUBLIC_REQUESTED_PERMISSIONS}`;
+
+// alert("launched");
+if(window.location.href !== linkedinAuthUrl){
+  // Step 5: Once the user authorizes your app, LinkedIn will redirect them to your redirect URI with an authorization code in the query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const authorizationCode = urlParams.get('code');
+  // const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+  const corsProxyUrl = 'http://localhost:8080/';
+  let userId, accessToken;
+  
+  // Step 6: Exchange the authorization code for an access token
+  const linkedinTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${authorizationCode}&redirect_uri=${process.env.PLASMO_PUBLIC_REDIRECT_URI}&client_id=${process.env.PLASMO_PUBLIC_CLIENT_ID}&client_secret=${process.env.PLASMO_PUBLIC_CLIENT_SECRET}`;
+  // alert("launch");
+  fetch(linkedinTokenUrl, {
+    method: 'POST'
+  })
+  .then((response) => {
+    // alert(`GET RESPONSE AUTHORIZATION ${response}*`);
+    // console.log(`GET RESPONSE AUTHORIZATION ${response.json()}`);
+    console.log(`GET response json`, response);
+    return response.json();
+  } )
+  .then((data) => {
+    // Step 7: Use the access token to make API requests
+    // alert(`data : ${data}`);
+    console.log(`data :`, data);
+    if(data.error === "invalid_request"){
+      window.location.href = linkedinAuthUrl;
+    }
+    else{
+      accessToken = data.access_token;
+      console.log("ruuned", accessToken)
+      // Include the access token in the Authorization header of your API requests to LinkedIn
+      const linkedinApiUrl = 'https://api.linkedin.com/v2/me';
+
+      // First fetch request to retrieve the LinkedIn user ID
+      fetch(corsProxyUrl+linkedinApiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'cache-control': 'no-cache',
+          'X-Restli-Protocol-Version': '2.0.0'
+        }
+      })
+      .then((response) => {
+        // alert(`success in fetching user id ${response.status}`)
+        return response.json();
+      })
+      .then((data) => {
+        // alert("datalaunch")
+        console.log("ldataaunch");
+        userId = data.id;
+        console.log("USER_ID", userId);
+        // Second fetch request to retrieve the user's publications
+        const linkedinSharesUrl = `https://api.linkedin.com/v2/shares?owners=urn:li:person:${userId}`;
+        fetch(corsProxyUrl + linkedinSharesUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'cache-control': 'no-cache',
+            'X-Restli-Protocol-Version': '2.0.0'
+          }
+        }).then((response) => {
+          // alert(`success in fetching user's publications ${response.status}`)
+          return response.json();
+        })
+        .then((data) => {
+          // alert(`linkedinSharesUrl: ${data}`);
+          console.log(data);
+        })
+        .catch((error) => {
+          // alert(`error occured when trying ti get user's id ${error.message}`);
+          console.error("error occured when trying ti get user's id",error);
+        });
+      })
+    }
+  })
+  .catch((error) => {
+    // alert(`An error occured during fetch authorization ${error}`)
+    console.error(`An error occured during fetch authorization ${error}`);
+  });
+}

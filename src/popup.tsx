@@ -7,9 +7,9 @@ function IndexPopup() {
     <section className="shadow-md border-gray-200 border-1 w-96">
       <header className="p-5 bg-gray-200/20 flex justify-between">
         {/* Extension Informations */}
-        <figure className="flex">
-          <img src={Logo} alt="Logo" title="GPT-Link" className="h-16" />
-          <figcaption className="ml-2 flex flex-col justify-between">
+        <figure className="flex items-start">
+          <img src={Logo} alt="Logo" title="GPT-Link" className="w-1/2" />
+          <figcaption className="ml-2 h-full flex flex-col justify-between">
             <h1 className="text-xl font-bold">GPT-Link</h1>
             <p>
               <a

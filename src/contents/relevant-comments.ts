@@ -136,7 +136,6 @@ const AddCommentsTools = () => {
             throw new Error("OpenAI API key not configured");
           }
           const commentInput = commentBox.parentNode.querySelector(".comments-comment-box-comment__text-editor .editor-content.ql-container .ql-editor");
-            
           try {
             await openai.createCompletion({
               model: "text-davinci-003",

@@ -1,0 +1,121 @@
+import type { PlasmoCSConfig } from "plasmo";
+import { Configuration, OpenAIApi } from "openai";
+
+const configuration = new Configuration({
+  apiKey: process.env.PLASMO_PUBLIC_OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+ 
+export const config: PlasmoCSConfig = {
+  matches: ["https://www.linkedin.com/feed/*"],
+}
+
+// Step 4: Redirect the user to LinkedIn's authorization page
+const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.PLASMO_PUBLIC_CLIENT_ID}&redirect_uri=${process.env.PLASMO_PUBLIC_REDIRECT_URI}&scope=${process.env.PLASMO_PUBLIC_REQUESTED_PERMISSIONS}`;
+
+if(window.location.href !== linkedinAuthUrl){
+  // Step 5: Once the user authorizes your app, LinkedIn will redirect them to your redirect URI with an authorization code in the query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const authorizationCode = urlParams.get('code');
+  const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+  let userId, accessToken;
+  
+  // Step 6: Exchange the authorization code for an access token
+  const linkedinTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${authorizationCode}&redirect_uri=${process.env.PLASMO_PUBLIC_REDIRECT_URI}&client_id=${process.env.PLASMO_PUBLIC_CLIENT_ID}&client_secret=${process.env.PLASMO_PUBLIC_CLIENT_SECRET}`;
+  alert("launch");
+  fetch(corsProxyUrl+linkedinTokenUrl, {
+    method: 'POST'
+  })
+  .then((response) => {
+    alert(`GET RESPONSE AUTHORIZATION ${response}*`);
+    // console.log(`GET RESPONSE AUTHORIZATION ${response.json()}`);
+    console.log(`GET response json`, response);
+    return response.json();
+  } )
+  .then((data) => {
+    // Step 7: Use the access token to make API requests
+    alert(`data : ${data}`);
+    console.log(`data :`, data);
+    if(data.error === "invalid_request"){
+      window.location.href = linkedinAuthUrl;
+    }
+    else{
+      accessToken = data.access_token;
+      console.log("ruuned", accessToken)
+      // Include the access token in the Authorization header of your API requests to LinkedIn
+      const linkedinApiUrl = 'https://api.linkedin.com/v2/me';
+
+      // First fetch request to retrieve the LinkedIn user ID
+      fetch(corsProxyUrl+linkedinApiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'cache-control': 'no-cache',
+          'X-Restli-Protocol-Version': '2.0.0'
+        }
+      })
+      .then((response) => {
+        alert(`success in fetching user id ${response.status}`)
+        return response.json();
+      })
+      .then((data) => {
+        alert("launch")
+        console.log("launch");
+         userId = data.id;
+        console.log("USER_ID", userId);
+      })
+    }
+  })
+  .catch((error) => {
+    alert(`An error occured during fetch authorization ${error}`)
+    console.error(`An error occured during fetch authorization ${error}`);
+  });
+  // Second fetch request to retrieve the user's publications
+  // const linkedinSharesUrl = `https://api.linkedin.com/v2/shares?q=owners&owners=urn:li:person:${userId}&sharesPerOwner=100`;
+  // fetch(corsProxyUrl + linkedinSharesUrl, {
+  //   method: 'GET',
+  //   headers: {
+  //     'Authorization': `Bearer ${accessToken}`,
+  //     'cache-control': 'no-cache',
+  //     'X-Restli-Protocol-Version': '2.0.0'
+  //   }
+  // }).then((response) => {
+  //   alert("success in fetching user's publications")
+  //   return response.json();
+  // })
+  // .then((data) => {
+  //   alert(`Data: ${data}`);
+  //   console.log(data);
+  // })
+  // .catch((error) => {
+  //   alert(`error occured when trying ti get user's id ${error.message}`);
+  //   console.error("error occured when trying ti get user's id",error);
+  // });
+}
+
+
+
+// let isLoading = false;
+// if(!isLoading){
+//   isLoading = true;
+//   try {
+//     await openai.createCompletion({
+//       model: "text-davinci-003",
+//       prompt: "prompt",
+//       temperature: 0,
+//       max_tokens: 500,
+//     }).then((explanation)=>{
+//       const gptExplanation = explanation.data.choices[0].text.replaceAll("\n\n", "");
+//       if(localStorage.getItem("gptSuggestion")){
+//         let gptSuggestion = localStorage.getItem("gptSuggestion").split("[GPT-Link]");
+//         gptSuggestion.push(gptExplanation);
+//         localStorage.setItem("gptSuggestion", gptSuggestion.join("[GPT-Link]") )
+//       }
+//       else{
+//         localStorage.setItem("gptSuggestion", gptExplanation);
+//       }
+//     })
+//   } catch(error) {
+//   }
+//   isLoading = false;
+// }
