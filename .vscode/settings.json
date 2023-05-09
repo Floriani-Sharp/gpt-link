@@ -1,0 +1,10 @@
+{
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "sonarlint.disableTelemetry": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": [
+        "source.addMissingImports",
+        "source.fixAll.eslint"
+    ],
+}
