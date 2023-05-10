@@ -17,6 +17,8 @@ let contextOfTerm = "";
 let isLoading = false;
 
 // Create the context menu 
+// Code to create a context menu for explaining terms
+
 
 const EXPLAIN_TOOL = document.createElement("button");
 EXPLAIN_TOOL.innerHTML = `
@@ -146,12 +148,11 @@ BACKGROUND_EXPLANATION.addEventListener('click', function() {
   document.body.removeChild(EXPLANATION);
 });
 
-function generatePrompt(term,context) {
+function generatePrompt(term, context) {
   return `
-    Pouvez-vous me fournir une explication concise, en français, du terme "${term}" dans le contexte "${context}" ? 
-    Veuillez inclure 3 exemples d'utilisation sous forme de liste à puces, 
-    ainsi qu'un lien externe (ouvre un nouvel onglet) pour en savoir plus. 
-    Merci de formater votre réponse en utilisant des balises HTML. 
-    La réponse ne doit pas dépasser 70 mots.
-  `;
+    Veuillez me fournir une explication concise, en français, du terme "${term}" dans le contexte de "${contexte}" sur LinkedIn. 
+    Il serait utile que vous incluiez trois exemples d'utilisation du terme, présentés sous forme de puces. En outre, veuillez inclure un lien externe qui s'ouvre dans un nouvel onglet pour plus d'informations. 
+    Veuillez formater votre réponse en utilisant les balises HTML. La réponse ne doit pas dépasser 70 mots.
+  ` ;
 }
+
