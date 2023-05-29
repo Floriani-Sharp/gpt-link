@@ -41,3 +41,7 @@ Once the extension is installed, you can use the various features directly on Li
 ### Changelog
 
 - Version 0.0.1
+
+### Author
+
+TIGRI Amadeus Friant Fleury
