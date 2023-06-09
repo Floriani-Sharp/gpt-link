@@ -6,7 +6,11 @@ The GPT-Link extension is a powerful tool that increases your productivity when 
 
 ### Functions
 
-#### Component 1: Term Explanation
+#### Component 1: Suggest a post
+
+This feature allows you to suggest a post based on a subject provided by you. Simply enter the subject and click the "Suggest Post" button to receive a suggested post. This helps you generate ideas and content for your LinkedIn posts.
+
+#### Component 2: Term Explanation
 
 This feature allows you to have selected terms explained on LinkedIn. Simply highlight the term you want, click the "Explain Term" button, and get the explanation. This allows you to better understand complex terms in your text and provide accurate information.
 
