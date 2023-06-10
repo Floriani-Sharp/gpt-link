@@ -150,7 +150,7 @@ BACKGROUND_EXPLANATION.addEventListener('click', function() {
 
 function generatePrompt(term, context) {
   return `
-    Veuillez me fournir une explication concise, en français, du terme "${term}" dans le contexte de "${contexte}" sur LinkedIn. 
+    Veuillez me fournir une explication concise, en français, du terme "${term}" dans le contexte de "${context}" sur LinkedIn. 
     Il serait utile que vous incluiez trois exemples d'utilisation du terme, présentés sous forme de puces. En outre, veuillez inclure un lien externe qui s'ouvre dans un nouvel onglet pour plus d'informations. 
     Veuillez formater votre réponse en utilisant les balises HTML. La réponse ne doit pas dépasser 70 mots.
   ` ;

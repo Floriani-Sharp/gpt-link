@@ -135,40 +135,7 @@ label.appendChild(svg);
 
 // Toggle the suggestions visibility when we click on "Afficher les suggestions" label or the svg
 const toggleSuggestions = () => {
-  // LIST_SUGGESTION.innerHTML = "";
-  // const MOCKUP = [
-  //   "Je trouve que le travail de Mag LANHA est très impressionnant. Les méthodes informatiques et statistiques qu'il propose sont très utiles et bien documentées. Les rapports, mémoires, thèses et articles qu'il propose sont très bien écrits et très bien documentés. Il est clair que Mag LANHA a une grande connaissance et une grande expérience dans le domaine des méthodes informatiques et statistiques. Je recommande vivement son travail à tous ceux qui cherchent à améliorer leurs compétences en informatique et en statistiques.",
-  //   "Je suis déçu par le contenu proposé par Mag LANHA sur LinkedIn. Les méthodes informatiques et statistiques sont des outils puissants, mais le contenu proposé ne semble pas être à la hauteur des attentes. Les rapports, mémoires, thèses et articles proposés ne sont pas assez détaillés et ne fournissent pas suffisamment d'informations pour être utiles. De plus, le site Web est très basique et ne propose pas de fonctionnalités supplémentaires pour aider les utilisateurs à trouver ce dont ils ont besoin. Enfin, le contenu est très limité et ne couvre pas tous les sujets liés aux méthodes informatiques et statistiques.",
-  //   "Félicitations à Mag LANHA pour avoir partagé ses connaissances et ses recherches sur les méthodes informatiques et statistiques. Votre contribution à la communauté scientifique est très appréciée et votre travail est une source d'inspiration pour les autres. Votre site Web est une excellente ressource pour les chercheurs et les étudiants qui cherchent à en apprendre davantage sur ces sujets. Merci pour votre partage et votre engagement à partager vos connaissances avec le monde.",
-  //   "Salut Mag LANHA, je suis très intéressé par votre travail sur les méthodes informatiques et statistiques. J'aimerais en savoir plus sur votre travail et comment vous l'utilisez pour résoudre des problèmes. Pouvez-vous me donner plus de détails sur votre travail et comment vous l'utilisez pour résoudre des problèmes ? Merci d'avance !",
-  //   "Je viens de découvrir le site Web de Mag LANHAMag LANHA • 2nd • 2nd et je suis très impressionné par ses méthodes informatiques et statistiques. J'ai trouvé des rapports, des mémoires, des thèses et des articles très intéressants et utiles. Je suis sûr que ces informations seront très utiles pour les étudiants et les chercheurs. Je recommande vivement ce site à tous ceux qui sont intéressés par les méthodes informatiques et statistiques.",
-  //   "Félicitations à Mag LANHA pour avoir partagé cette ressource précieuse sur LinkedIn! Les méthodes informatiques et statistiques sont des outils essentiels pour comprendre et analyser les données. La publication de Mag LANHA offre une excellente occasion de s'informer sur les rapports, mémoires, thèses et articles disponibles sur le sujet. Je suis sûr que cette ressource sera très utile pour les chercheurs et les étudiants qui s'intéressent aux méthodes informatiques et statistiques. Merci à Mag LANHA pour cette contribution précieuse!",
-  //   "Je trouve que le contenu de Mag LANHA est très intéressant et utile. Je suggère d'ajouter des liens vers des articles et des ressources supplémentaires pour aider les lecteurs à en apprendre davantage sur les méthodes informatiques et statistiques. De plus, je suggère d'ajouter des exemples concrets pour illustrer comment ces méthodes peuvent être appliquées dans des contextes réels. Cela aiderait les lecteurs à mieux comprendre et à appliquer ces méthodes."
-  // ]
-  // LIST_SUGGESTION.style.listStyleType = "decimal";
-  //   for (let i = 0; i < MOCKUP.length; i++) {
-  //     let li = document.createElement("li");
-  //     li.innerHTML = MOCKUP[i];
-  //     li.title = `${i+1}. ${MOCKUP[i]}`
-  //     li.style.padding = "5px";
-  //     li.style.cursor = "pointer";
-  //     li.style.display = '-webkit-box';
-  //     li.style.webkitLineClamp = '3';
-  //     li.style.webkitBoxOrient = 'vertical';
-  //     li.style.overflow = 'hidden';
-  //     li.onmouseover = function() {
-  //       li.style.backgroundColor = "#f6f6f6";
-  //     };
-  //     li.onmouseout = function() {
-  //       li.style.backgroundColor = "white";
-  //     };
-  //     li.onclick = function() {
-  //       navigator.clipboard.writeText(li.innerHTML);
-  //       alert(`Copié dans le presse-pappier : ${li.innerHTML}`)
-  //       LIST_SUGGESTION.style.display = "none";
-  //     };
-  //     LIST_SUGGESTION.appendChild(li);
-  //   }
+  LIST_SUGGESTION.innerHTML = "";
   if(localStorage.getItem("gptSuggestion")){
     const SUGGESTIONS = localStorage.getItem("gptSuggestion").split("[GPT-Link]");
     LIST_SUGGESTION.style.listStyleType = "decimal";
